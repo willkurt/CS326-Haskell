@@ -1,4 +1,7 @@
 *~
 *.hi
+*.o
+
 class1/name
+
 class1/hello
