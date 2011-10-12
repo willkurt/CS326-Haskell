@@ -1,0 +1,23 @@
+Here are some useful Haskell resources that can be very helpful when you're stuck
+
+Learn you a Haskell for Great Good
+http://learnyouahaskell.com
+
+Really excellent introduction to Haskell, start here if you're having trouble with any of the concepts.
+
+
+Real World Haskell
+http://book.realworldhaskell.org/read/
+
+More helpful if you already have some familiarity with Haskell. As the title implies, this book if full of Haskell solutions to "real world" problems.
+
+
+Write Yourself a Scheme in 48 Hours
+http://en.wikibooks.org/wiki/Write_Yourself_a_Scheme_in_48_Hours
+
+Really excellent tutorial that will walk you through writing a non-trivial Haskell program, plus you'll end up with a pretty functional Scheme by the end.
+
+Hoogle
+http://www.haskell.org/hoogle/
+
+Once we cover Haskell's type system, this excellent search engine will become pretty much invaluable.
