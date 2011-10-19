@@ -117,6 +117,243 @@ and here's a really verbose way of re-writing add
 
 Although they seem simple, they are both very useful and very powerful from a theoretical standpoint.
 
+3. Return!
+Okay so this isn't really that complicate but it's an important feature of most functional programming langauges.
+
+In functional programming it makes no sense to not return a value.  In C/C++ functions
+that don't return a value are usually of type 'void', and the function will almost always
+have side effects.  If a function return no value and had no side effects it would do nothing.
+Since we can't have side effects in Haskell we must then always be returning a value 
+(as always there are exceptions).  So in Haskell you never have to 'return' a value.
+However you will use code that calls 'return' but this has a very, very different usage,
+which will will cover later.
 
 
+--So uhm... how do we write actual code?
 
+Hopefully by now some of the oddities of functional programming have started to click.
+That simple rule about referential transparency has some pretty big consequences.
+For example "for loops", "while loops" etc can't exist without changing state, and thus
+having side effects.  We also can't have variables, and c-like arrays. Imagine writing C++ 
+where literally everything is declared 'const' eg for(const int i = 0....) 
+
+The 2 most important thing you have to understand to write functional code are
+lists and recursion
+
+Lists are the primary datastructure you'll be using when writing funcitonal code,
+so there's some basic list operations you'll need to be super comfortable with
+
+Lists in Haskell look like this
+
+>alist = [1,2,3,4,5]
+
+a cool thing about haskell is that you can also right that same list
+
+>anotherList = [1..5]
+
+even cooler is you can declare infinite lists (we'll touch on this much more later)
+
+>evenNumbers = [0,2..]
+
+We can access the nth elemnt in a list by using '!!'
+This really need with infinite lists...
+
+>oneThousandthEven = evenNumbers !! 1000
+
+you can join to lists with with concat
+
+>oneThroughSix = concat [[1,2,3],[4,5,6]]
+
+for reasons we'll discuss later you can actually concat 2 infinite lists
+(if this doesn't wow you, you should definitely think about this for a bit)
+
+>whatDoesThatEvenMean = concat [[0,2..],[1,3..]]
+
+One of the key ideas to understand list is to understand what is called in Lisp 'consing'
+
+A list can be viewed as being made of 2 parts
+
+a head which is the first element of the list
+
+>aHead = head [1,2,3,4]
+
+and a tail which is the rest of the elements
+
+>aTail = tail [1,2,3,4]
+
+the ':' operated takes a head and attaches a tail
+
+>theList = [1,2,3,4]
+>sameList = 1:[2,3,4]
+>alsoSame = (head theList):(tail theList)
+>thisIsTrue = (theList == sameList) && (theList == alsoSame)
+>oneList = 1:[]
+
+In fact the form of [1,2,3,4] in Haskell is actually syntactic sugar for
+1:2:3:4:[]
+
+>iAmSerious = 1:2:3:4:[]
+>toldYouSo = iAmSerious == theList
+
+On more important thing to pay attention to is the empty list '[]'
+This is extremely important because quite often we use it to recognize
+when we have reached the end of an iterative process
+
+For example let's define a recursive function to determine the length of a list
+(we're also going to make light use of something called 'pattern matching' which we'll dicuss in more detail in later lectures)
+
+
+>myLength [] = 0
+>myLength xs = 1 + myLength (tail xs)
+
+just to not let pattern matching confuse you, we could have written this
+
+>myLength2 xs = if xs == []
+>               then 0
+>               else 1 + myLength2 (tail xs)
+
+This is an insanely simple exame, but it should give you an idea
+
+If looking at that little bit of recursion gave you a headache... well 
+maybe you should study up a bit.
+
+However Haskell (and all functional languages) have some really create ways to
+abstract away recursion. 
+
+-- Higher Order Functions! (on lists)
+
+Technically a higher order function refer to any function that takes another function as one of it's arguments.
+But more commonly there are a group of them are used to replicate common
+iteration patterns
+
+If you go back an look over every for or while loop you'd ever written
+and wrote down what they do, you'd find that there are really only a 
+handful of very similiar types of operations.
+
+1. Map
+map is a function that takes another function and a list, and applies that
+function to every item in the list, returning a new list.
+
+also this is a great example of why lambdas are really useful
+
+here's a funciton that doubles every element of alist
+
+>theDoubler xs = map (\x->x*2) xs
+
+and here's one that doubles only odd numbers
+
+>theOddDoubler xs = map (\x-> if even x
+>                            then x
+>                            else x*2) xs
+
+If you think back to most for loops you've writen, they probably do something similiar to map.  Also you don't have to use a lamdba, for complex operations you should use a named function.
+
+
+2. Filter
+
+Another common operation we do when iterating is to search for items that match
+a certain critiria.  
+
+filter, as you probably could guess form the name, does just that
+it takes similiar arguments only rather than a function that performs
+an operation on x, it takes a funciton that returns a True/False value
+if True the item is added to a list
+
+if we want to take only the even numbers we can do it like this
+
+>evenList xs = filter even xs
+
+or all numbers that are mod 17
+
+>mod17List xs = filter (\x-> ((x `mod` 17) ==  0)) xs
+
+the remembering that we can create infinit lists in Haskell
+we can construct a list of all possible mutiles of 17
+
+>sevenTeens = mod17List [1..]
+
+This is done using something called 'Lazy Evaluaiton'
+want to know what the 217th multiple of 17 is?
+
+>twoSevenTeenTh = sevenTeens !! 217
+
+pretty neat!
+
+3. Foldl
+
+Another extremely common use of loops is to reduce a series of values
+into a single value.  The most obvious example being to sum up the values
+in a list.
+
+The function we'll use for this is called 'foldl'
+the 'l' is for 'left' there is a 'foldr' as well.  
+
+'foldl' take one more argument than map and filter
+a binary function \x y -> ... an initial value and a list
+
+the way fold works is it uses the intial value as the first argument, 
+the head of the list as the second, and then returns a value which become
+the new intial value, it does this until the list is done and then returns
+a final result.
+
+let's write our own sum as an example.
+
+>mySum xs = foldl (+) 0 xs
+
+really simple right! (of course Haskell has a built in 'sum' function)
+
+a more interesting example is reverse
+
+>myReverse xs = foldl (\x y -> y:x) [] xs
+
+Here is where we really see how powerful fold is!
+let's step through this one so that you can see it
+
+myReverse [1,2,3] = foldl (\x y -> y:x) [] xs
+                    foldl (\[] 1 -> 1:[]) [] [1,2,3]
+                    foldl (\[1] 2 -> 2:[1]) [1] [2,3]
+                    foldl (\[2,1] 3 -> 3:[2,1]) [2,1] [3]
+                    [3,2,1]
+
+folds are well worth your time to study further, they are fascinating
+and provide solutions to many problems.
+
+finally here's an example of why I love Haskell
+I'll give the definition of standard deviation
+and follow along with real haskell code.
+(there are a few things we haven't discussed but you'll get the idea)
+
+
+step 1. calculate the arithmetic mean of the list
+
+>mean xs = sum xs / fromIntegral(length xs)
+
+step 2. subtract the mean from all the numbers in the list
+
+>deviations xs = map (\x -> x -m) xs
+>    where m = mean xs
+
+step 3. square the numbers in that list
+
+>squareDeviations xs = map (^2) devs
+>    where devs = deviations xs
+
+step 4. calculate the sum of the list
+
+>sumSquareDeviations xs = (sum . squareDeviations) xs
+
+step 5. divide the sum by length of list 
+step 6. get the square root of this number
+
+>sd xs = sqrt $ sumSqDeviations / lenMinus1
+>        where sumSqDeviations = sumSquareDeviations xs
+>              lenMinus1 = fromIntegral $ ((-1 + ) . length) xs
+
+As you become more experience in Haskell you'll see that I stretched that out
+but hopefully you'll get the idea that well written Haskell almost follows
+the mathematical description 1:1
+
+That's it for the first lecture! Do make sure to spend time reading up on Haskelll
+A compent programming can learn a language like python from just reading some smaples, this is NOT the case with Haskell.  In general my saying is: "If you don't understand why it works, it won't"
+
+Have fun!
