@@ -21,3 +21,7 @@ Hoogle
 http://www.haskell.org/hoogle/
 
 Once we cover Haskell's type system, this excellent search engine will become pretty much invaluable.
+
+Here are the lecture notes from Standford's full semester course on Haskell
+http://www.scs.stanford.edu/11au-cs240h/sched/
+
