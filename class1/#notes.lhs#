@@ -118,7 +118,7 @@ and here's a really verbose way of re-writing add
 Although they seem simple, they are both very useful and very powerful from a theoretical standpoint.
 
 3. Return!
-Okay so this isn't really that complicate but it's an important feature of most functional programming langauges.
+Okay so this isn't really that complicated but it's an important feature of most functional programming langauges.
 
 In functional programming it makes no sense to not return a value.  In C/C++ functions
 that don't return a value are usually of type 'void', and the function will almost always
