@@ -180,10 +180,19 @@ if you just type in
 read "6" 
 Haskell cannot possibly figure out what Type you want back!
 
+>add3things :: Int -> Int -> Int -> Int
+>add3things x y z = sum [x,y,z]
+
+
+>makeTriple :: a -> a -> a -> [a]
+>makeTriple x y z = [x,y,z]
+
+>whatHappens = makeTriple 1 2
 
 Okay so hopefully you have a better sense of Haskell's amazing type system, there's
 a lot more to it that we'll go into later.
 
+>mrTest = 1
 
 So here's a new question for you, what's the type of
 
@@ -250,7 +259,7 @@ Well we need to take the user's input of a list and send it to sd, but it will b
 a String form teh command line... of course we'll use read!
 
 >inputToSd :: String -> Double
->inputToSd i = (sd . read) i
+>inputToSd  = (sd . read)  
 
 Rembember the '.' is for function composition, we're taking 'sd' and 'read' to make
 one new function that takes a string, 'like read', and outputs a double, like 'sd'
