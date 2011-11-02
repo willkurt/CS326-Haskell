@@ -315,3 +315,106 @@ it's best that you actually write a seperate funtion for that.
 Also you can always add " deriving(Show)" to the end of your
 type definition and you'll get a basic 'show' without having to 
 write it your self
+
+okay let's try our main
+
+>main1 = do
+>  parsed <- return $ parseWil wilExample
+>  putStrLn $ show parsed
+
+now that's pretty clean! and we know it's a efficient! Not bad for purely functional ;)
+
+There's still one irksome thing... we don't really know that we have a WIL file
+
+>failFormat = "NOTWIL090294ljDFAsdfjsldkafjsdfASDLFAJSDF"
+
+one solution have is to raise an error
+
+>errParse s = if first3 == "WIL"
+>             then parseWil s
+>             else error "not a will file format!"
+>    where first3 = take 3 s
+
+feel free to try errParse in ghci.
+
+This is pretty good, but if we're using this data and passing it arround between functions
+it might be nice to have more flexibility with how we delt with this.
+
+Haskell has a really intersting type call 'Maybe', which when you first approach it
+can sound pretty funny.
+
+The 'Maybe' type makes use of something called a type constructor.
+If we were to define maybe it would look like this
+
+data Maybe a = Just a | Nothing
+
+So Maybe take a type parameter 'a' and has 2 type constructors.
+
+so let's revise our parse one more time...
+
+>safeParse :: String -> Maybe WilParseData
+
+look at the type signature and make sure it makes sense.
+we're going to take a string and return a 'Maybe' WilParseData
+this can mean either 'Just WilParseData' or 'Nothing'
+We can later pattern match against these to pull out our value
+or deal with the fact that we didn't get a value
+
+oh and while we're at it, let's use guards (organizationally this code is doing nearly
+the same thing as errParse)
+
+>safeParse s | first3 == "WIL" = Just (parseWil s)
+>            | otherwise = Nothing
+>    where first3 = take 3 s
+
+Now this might not seem to obvious but let's look at 2 examples
+
+>realData = safeParse wilExample
+>fakeData = safeParse failFormat
+
+what makes this preferable to throwing an exception is that we
+can have a series function operate on this data and continually
+defer handing that exception until later.
+
+If you're still having trouble, Maybe is similiar to another type we've seen, IO
+rember IO String, IO Int etc.
+
+The big difference is while IO will not allow you to get data out, Maybe will
+
+Here's something we couldn't do with an error message...
+
+>safeShow :: Maybe WilParseData -> String
+>safeShow (Just w) = show w
+>safeShow Nothing = "Parse failed"
+
+Let's put our main together one more time...
+
+>main = do
+>  goodData <- return $ safeParse wilExample
+>  badData <- return $ safeParse failFormat
+>  putStrLn $ safeShow goodData
+>  putStrLn $ safeShow badData
+
+
+Aside from a way to handle errors, Maybe is a great solution to the problem of 'null'.  
+In the real world 'null' is a real pain, and there are far too many times where it
+is the cause of unexpected bugs.  Writing code with the proper use of Maybe can really
+reduce the occurrance of this type of bug.
+
+Finally I cheated just a bit in all of the above since I was just parsing a string.
+When you're reading a binary file you'll actually want to use either
+
+Data.ByteString
+-or-
+Data.Lazy.ByteString
+
+-and-
+
+Data.Char8
+-or-
+Data.Lazy.Char8
+
+check out
+http://www.haskell.org/haskellwiki/DealingWithBinaryData
+and
+http://book.realworldhaskell.org/read/code-case-study-parsing-a-binary-data-format.html
