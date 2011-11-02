@@ -27,11 +27,11 @@ One more interesting point, these notes.. well they'll compile! This is a specia
 
 --Functional Programming!!!
 
-So what makes Haskell special? There's actually a lot, so for this first lecture I'll focus 
+So what makes Haskell special? There's actually a lot, so for this first lecture I'll focus on 
 Functional Programming!!!
 
 If you're a good CS student you have probably already heard a little (or even a lot) about
-functional programming, but what does that really mean.
+functional programming, but what does that really mean?
 
 The abstract idea is that functional programming tries to make defining programs more like
 how we define mathematical ideas.
@@ -51,10 +51,13 @@ A better way to view is this that:
    the function will always return the same output
 
 That's how math works right? 
-you can never have f(x) -> y and sometime f(x) -> z where y != z
+you can never have f(x) -> y and sometimes f(x) -> z where y != z
 
 This idea is pretty powerful when you think about it.
-Whenver you call a function in Haskell you know that it doesn't change anything about the world, it merely returns a value. When you write C/C++ think about how many time as function or a method changes the global state of the program you're running? Just as C draws some of it's power from allowing this Haskell draws strength from not allowing.
+Whenever you call a function in Haskell you know that it doesn't change anything about the world, it merely returns a value. 
+When you write C/C++ think about how many time a function or a method changes the global state of
+the program you're running? Just as C draws some of it's power from allowing this Haskell draws 
+strength from not allowing it.
 
 The concept is refered to as REFERENTIAL TRANSPARENCY
    
@@ -66,9 +69,9 @@ So before we dive into how we're going to think about coding in a funcitonal way
 some of the things we usually have in a functional language.
 
 1. First Class Functions
-This is actually a feature of python, all it means is that we can pass functions just like any other
+This is actually a feature of python as well, all it means is that we can pass functions just like any other
 value. In fact a key concept of functional programming is that "Code is Data" (although this is more
-important with lisps)
+significant with lisps)
 
 Here's a trivial example
 
@@ -79,7 +82,7 @@ let's make some simple function that take 1 argument and add a value to that
 
 One thing to note here is that we don't have to call 'return', in functional languages a values is always returned, another nice guarantee
 
-For our example let's make the opposite
+For our example let's make the dual of this function
 that is a function that takes a function and applies the argument
 
 >argIs1 func = func 1
@@ -91,13 +94,13 @@ now let's combine these to demonstrate how first class functions work
 >answerIs3 = argIs2 add1
 >alsoIs3 = argIs1 add2
 
-even though this example is trivial and contrived the idea of passing functions around 
+even though this example is trivial and contrived, the idea of passing functions around 
 should make sense, and hopefully you can get an idea how this would be useful. If not
 you'll soon see this.
 
 2. Lambda the Ultimate!
 
-Functional programming is actually based on a model of computation call the 
+Functional programming is actually based on a model of computation called the 
 Lambda Calculus
 a 'lambda function' is simply an unnamed function. It turns out you can do a lot
 with unnamed functions, including implement recursion (how does an unnamed function call itself?)
@@ -122,11 +125,11 @@ Okay so this isn't really that complicate but it's an important feature of most 
 
 In functional programming it makes no sense to not return a value.  In C/C++ functions
 that don't return a value are usually of type 'void', and the function will almost always
-have side effects.  If a function return no value and had no side effects it would do nothing.
+have side effects.  If a function returned no value and had no side effects it would do nothing.
 Since we can't have side effects in Haskell we must then always be returning a value 
 (as always there are exceptions).  So in Haskell you never have to 'return' a value.
 However you will use code that calls 'return' but this has a very, very different usage,
-which will will cover later.
+which we will cover later.
 
 
 --So uhm... how do we write actual code?
@@ -147,7 +150,7 @@ Lists in Haskell look like this
 
 >alist = [1,2,3,4,5]
 
-a cool thing about haskell is that you can also right that same list
+a cool thing about haskell is that you can also write that same list like this
 
 >anotherList = [1..5]
 
@@ -156,11 +159,11 @@ even cooler is you can declare infinite lists (we'll touch on this much more lat
 >evenNumbers = [0,2..]
 
 We can access the nth elemnt in a list by using '!!'
-This really need with infinite lists...
+This really neat with infinite lists...
 
 >oneThousandthEven = evenNumbers !! 1000
 
-you can join to lists with with concat
+you can join two lists with concat
 
 >oneThroughSix = concat [[1,2,3],[4,5,6]]
 
@@ -169,7 +172,7 @@ for reasons we'll discuss later you can actually concat 2 infinite lists
 
 >whatDoesThatEvenMean = concat [[0,2..],[1,3..]]
 
-One of the key ideas to understand list is to understand what is called in Lisp 'consing'
+One of the key ideas to understand lists is to understand what is called in Lisp 'consing'
 
 A list can be viewed as being made of 2 parts
 
@@ -195,7 +198,7 @@ In fact the form of [1,2,3,4] in Haskell is actually syntactic sugar for
 >iAmSerious = 1:2:3:4:[]
 >toldYouSo = iAmSerious == theList
 
-On more important thing to pay attention to is the empty list '[]'
+One more important thing to pay attention to is the empty list '[]'
 This is extremely important because quite often we use it to recognize
 when we have reached the end of an iterative process
 
@@ -212,17 +215,17 @@ just to not let pattern matching confuse you, we could have written this
 >               then 0
 >               else 1 + myLength2 (tail xs)
 
-This is an insanely simple exame, but it should give you an idea
+This is an insanely simple example, but it should give you an idea
 
 If looking at that little bit of recursion gave you a headache... well 
 maybe you should study up a bit.
 
-However Haskell (and all functional languages) have some really create ways to
+However Haskell (and all functional languages) have some really great ways to
 abstract away recursion. 
 
 -- Higher Order Functions! (on lists)
 
-Technically a higher order function refer to any function that takes another function as one of it's arguments.
+Technically a 'higher order function' is any function that takes another function as one of it's arguments.
 But more commonly there are a group of them are used to replicate common
 iteration patterns
 
@@ -246,7 +249,8 @@ and here's one that doubles only odd numbers
 >                            then x
 >                            else x*2) xs
 
-If you think back to most for loops you've writen, they probably do something similiar to map.  Also you don't have to use a lamdba, for complex operations you should use a named function.
+If you think back to most for loops you've writen, they probably do something similiar to map.  
+Also you don't have to use a lamdba, for complex operations you should use a named function.
 
 
 2. Filter
@@ -254,7 +258,7 @@ If you think back to most for loops you've writen, they probably do something si
 Another common operation we do when iterating is to search for items that match
 a certain critiria.  
 
-filter, as you probably could guess form the name, does just that
+filter, as you probably could guess from the name, does just that
 it takes similiar arguments only rather than a function that performs
 an operation on x, it takes a funciton that returns a True/False value
 if True the item is added to a list
@@ -268,7 +272,7 @@ or all numbers that are mod 17
 >mod17List xs = filter (\x-> ((x `mod` 17) ==  0)) xs
 
 the remembering that we can create infinit lists in Haskell
-we can construct a list of all possible mutiles of 17
+we can construct a list of all possible multiples of 17
 
 >sevenTeens = mod17List [1..]
 
@@ -288,11 +292,11 @@ in a list.
 The function we'll use for this is called 'foldl'
 the 'l' is for 'left' there is a 'foldr' as well.  
 
-'foldl' take one more argument than map and filter
-a binary function \x y -> ... an initial value and a list
+'foldl' takes one more argument than map and filter
+a binary function \x y -> ..., an initial value, and a list
 
 the way fold works is it uses the intial value as the first argument, 
-the head of the list as the second, and then returns a value which become
+the head of the list as the second, and then returns a value which becomes
 the new intial value, it does this until the list is done and then returns
 a final result.
 
@@ -354,6 +358,7 @@ but hopefully you'll get the idea that well written Haskell almost follows
 the mathematical description 1:1
 
 That's it for the first lecture! Do make sure to spend time reading up on Haskelll
-A compent programming can learn a language like python from just reading some smaples, this is NOT the case with Haskell.  In general my saying is: "If you don't understand why it works, it won't"
+A compent programmer can learn a language like Python from just reading some samples and writing code, 
+this is NOT the case with Haskell.  In general my saying is: "If you don't understand why it works, it won't"
 
 Have fun!
