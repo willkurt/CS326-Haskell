@@ -8,6 +8,10 @@ may seem odd or difficult. However once you realize that streams are essentially
 lazy lists, you should see that they are quite natural to work with.
 
 Since streams are just lazy lists we can just work with a string.
+(note: in reality you'll need to import Data.ByteString to read from a binary file
+       this lecture will cover the way to think about parsing data, there should
+       be plenty of material online to get your familiar with how to read data
+       from a binary file using Haskell)
 
 Here's our imaginary WIL file format,
 
@@ -20,24 +24,24 @@ we have a header "WIL070408"
 04 indicates the size of the last name field
 08 indicates the size of the job title field
 
-If you open up most Haskell books and look into parse you're likely to 
-get an unexpect lecture on : Parsec (a great library for parsing), Functors (a 
+If you open up most Haskell books and look into parsing binary data you're likely to 
+get an unexpected lecture on : Parsec (a great library for parsing), Functors (a 
 useful typeclass that defines map), and/or Monads (a topic we've touched on 
 that we'll fill out later). All of these topics are fine and dandy, but can
 add unnecessary complexity while we're still trying to get started with 
 understanding the basics of functional programming.
 
-For now we're just going to worry about Solving our Problem, not doing it
+For now we're just going to worry about 'Solving our Problem', not doing it
 perfect. Most of real world software is solving a problem however imperfect
 that solution may be... However it is important to realize that there are 
-better ways to solves these problems in Haskell.
+better ways to solve these problems in Haskell.
 
-So to what do we need to solve this problem..
+So what do we need to solve this problem..
 Let's get the get that header first
 
 we know it's 3 + 2 + 2 + 2 chars so...
 
->getHeader wil = take 8 wil
+>getHeader wil = take 9 wil
 
 now that we have the head we need to parse that
 for now we don't really care about the 'WIL' so we can ignore it
@@ -55,19 +59,19 @@ first this take drop stuff is getting tedious..
 
 >takeDrop t d = (take t . drop d)
 
-and for sizes we know they're all 2
+and for sizes we know they are all 2
 
 >getSize = takeDrop 2
 
 ..and dispite our awesome get header function we don't actually need it
 
-first let's just hard code these offsets so our code is a bit more readable
+first let's just assign these offsets to variables so our code is a bit more readable
 
 >fnSizeOffset = 3
 >lnSizeOffset = 5
 >titleSizeOffset = 7
 
-and that should make oure code more abstract and more readable
+that's a little cleaner
 
 >getFirstNameSize' = getSize fnSizeOffset
 
@@ -78,7 +82,7 @@ so let's just stick a 'read' on there
 >getFirstNameSize = (read . getSize fnSizeOffset)
 
 there that's pretty readable (don't forget that we need the type signature 
-since right now the compiler has no idea what we intend to read
+since right now the compiler has no idea what we intend to read)
 
 >getLastNameSize :: String -> Int
 >getLastNameSize = (read . getSize lnSizeOffset)
@@ -86,7 +90,7 @@ since right now the compiler has no idea what we intend to read
 >getTitleNameSize :: String -> Int
 >getTitleNameSize = (read . getSize titleSizeOffset)
 
-So now we have our size all we need to do is grab
+So now we have our size, all we need to do is grab
 the content of those fields...
 
 this will come in handy...
@@ -108,11 +112,11 @@ not perfect but certainly readable and gets the job done
 
 
 So this isn't so bad, but you should notice some pretty obvious efficeincy issues
-First of we call 'getFirstNameSize' 3 times and 'getLastName' twice.  This in itself
+First off we call 'getFirstNameSize' 3 times and 'getLastName' twice.  This in itself
 isn't so bad since this just means going to the header a few extra times, and the header is small
 
 if we had 100 fields this mean this header would be read a over 5000 times just for getting that 
-one section. For each of the hundre fields we'd also have to get them roughly 5000 time.
+one section. For each of the hundred fields we'd also have to get them roughly 5000 times.
 
 But that's not even our biggest hidden cost.
 for every nth feild the entire file had to be reread total-n times!
@@ -124,7 +128,7 @@ reasonably acceptable.
 
 What we need is a way to share information between functions. Now normally we could just return 
 the value we need and have the next function use that value. After all this is essentially
-just composing a function. Our problem is that we ahve a lot of information to keep track
+just composing a function. Our problem is that we have a lot of information to keep track
 of. What we need is a 'type' that expresses our data.
 
 We'll use something call the 'record syntax' to make our type easier to work with.
@@ -138,7 +142,7 @@ first we need to keep track our input
 
 >         input :: String,
 
-the field sieze
+the field size
 
 >         firstNameSize :: Int,
 >         lastNameSize :: Int,
@@ -152,10 +156,10 @@ and of course the fields for our actual data
 >    }
 
 
-Cool! now we have a representation to play with, but lets see how we use type
+Cool! now we have a representation to play with, but lets see how we use this type
 
-For this test example we'll just fill in the fields we actually want care
-about, so this isn't a correct example
+For this test example we'll just fill in the fields we actually want and not the ones we don't
+care about, so this isn't a correct example
 
 
 >testWil = WilParseData { input= "BLAHBLAHBLAH"
@@ -172,9 +176,8 @@ The great thing is now we have an easy way to access this data
 >exFullName = (firstName testWil) ++ " " ++ (lastName testWil)
 
 
-
 Just a note here: record syntax gives us some nice accessor function for free.
-we could have also define the deaboe simply as
+we could have also define the above simply as
 
 >data WilParseData2 = WilParseData2 String Int Int Int String String String
 
@@ -182,7 +185,7 @@ and constructed it like this
 
 >testWil2 = WilParseData2 "BLAHBLAHBLAH" 0 0 0 "John" "Smith" "Everyman"
 
-plus we don't get our constructors... we have to write them ours selves like this...
+but we don't get our acessors... we have to write them ours selves like this...
 
 >firstName2 :: WilParseData2 -> String
 >firstName2 (WilParseData2 _ _ _ _ x _ _) = x
@@ -235,7 +238,7 @@ first we'll throw away those first 3 (we'll use them eventually I promise ;)
 Whoa wait, what's up with r {input = trimmed}
 did we just change the value of something!!!
 well yes and now, we passed essentially a new piece of data and, thanks
-the the record syntax, only had to mention which value we are
+to the record syntax, we only had to mention which value we are
 changing.  So we're still purely functional, but we do get to change values!
 
 >parseFirstNameSize r = parseLastNameSize r {input = trimmed, firstNameSize = fns}
@@ -279,7 +282,7 @@ Okay! let's see it in action now
 >          ln = lastName parsed
 >          t = title parsed
 
-This being haskell we could always do better :) however let's take amoment to see what we did
+This being haskell we could always do better :) however let's take a moment to see what we did
 While a little verbose, this parser will read out data in linear time, unlike the first
 version which needed to do plenty of repitious work, this one is able to continue to
 consume the input without needing to reread any pieces of data.
@@ -304,7 +307,7 @@ not currently a member of the 'Show' typeclass... but we can fix that
 >              ln = lastName r
 >              t = title r
 
-So now we can call 'show' on instance so of WilParseData!
+So now we can call 'show' on instance of WilParseData!
 this also means that users of our parser won't get errors if
 they're messing around in ghci
 
