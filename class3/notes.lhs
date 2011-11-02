@@ -48,11 +48,11 @@ for now we don't really care about the 'WIL' so we can ignore it
 
 let's get the sizes
 
->getFirstNameSizev1 wil = take 2 $ drop 3 head
->    where head = getHeader wil
+>getFirstNameSizev1 wil = take 2 $ drop 3 header
+>    where header = getHeader wil
 
->getLastNameSizev1 wil =  take 2 $ drop 5 head
->    where head = getHeader wil
+>getLastNameSizev1 wil =  take 2 $ drop 5 header
+>    where header = getHeader wil
 
 ... hmmmm there's a lot wrong with this already
 first this take drop stuff is getting tedious..
