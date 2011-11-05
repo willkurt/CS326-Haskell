@@ -362,4 +362,4 @@ replace something this pattern for he same problem
 i <- getLine
 intI <- return $ read i
 sq <- square intI * intI
-putStrLn $ show sw
+putStrLn $ show sq
