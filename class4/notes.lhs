@@ -335,6 +335,12 @@ In fact this is so valuable that fmap is actually the sole function in the type 
 
 --Functor--
 
+the functor type class looks like this
+
+class Functor f where
+      fmap :: (a -> b) -> f a -> f b
+
+
 Many different types belong to the type class Function.
 
 Cleary Maybe and List do.
@@ -363,3 +369,4 @@ i <- getLine
 intI <- return $ read i
 sq <- square intI * intI
 putStrLn $ show sq
+
