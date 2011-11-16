@@ -1,4 +1,4 @@
-Lecture Notes for Class 4 on Haskel Programming
+Lecture Notes for Class 4 on Haskell Programming
 
 Okay let's go back to thinking about more abstract things
 
